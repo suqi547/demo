@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>成长档案馆</title>
+<style>
+  :root {
+    --bg: #faf7f2;
+    --card: #ffffff;
+    --text: #2b2724;
+    --muted: #8a8078;
+    --line: #ebe4da;
+    --accent: #b06a45;
+    --accent-soft: #f5ebe3;
+    --brother: #6b8e7f;
+    --nephew: #c48a5a;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+    font-size: 15px;
+  }
+  a { color: inherit; text-decoration: none; }
+  img, video { max-width: 100%; display: block; }
+
+  /* ---------- Header ---------- */
+  header {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(250,247,242,.88);
+    backdrop-filter: saturate(180%) blur(14px);
+    -webkit-backdrop-filter: saturate(180%) blur(14px);
+    border-bottom: 1px solid var(--line);
+  }
+  .header-inner {
+    max-width: 1040px; margin: 0 auto;
+    padding: 13px 24px;
+    display: flex; align-items: center; gap: 20px;
+  }
+  .logo {
+    font-weight: 700; font-size: 16px; letter-spacing: .01em;
+    white-space: nowrap; cursor: pointer;
+    display: flex; align-items: center; gap: 7px;
+  }
+  .logo-dot {
+    width: 9px; height: 9px; border-radius: 50%;
+    background: var(--accent); flex-shrink: 0;
+  }
+  nav { display: flex; gap: 2px; flex: 1; }
+  nav a {
+    padding: 6px 11px; border-radius: 8px;
+    font-size: 14px; color: var(--muted);
+    transition: background .16s, color .16s;
+    white-space: nowrap;
+  }
+  nav a:hover { color: var(--text); background: #f0eae2; }
+  nav a.active { color: var(--accent); background: var(--accent-soft); font-weight: 600; }
+
+  .search-box { position: relative; flex-shrink: 0; }
+  .search-box svg {
+    position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+    width: 13px; height: 13px; opacity: .38; pointer-events: none;
+  }
+  .search-box input {
+    width: 160px; padding: 7px 12px 7px 31px;
+    border-radius: 20px; border: 1px solid var(--line);
+    background: #fff; font-size: 13px; font-family: inherit;
+    color: var(--text); outline: none;
+    transition: width .22s, border-color .22s, box-shadow .22s;
+  }
+  .search-box input:focus {
+    width: 210px; border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(176,106,69,.08);
+  }
+  .search-box input::placeholder { color: #b6ada4; }
+
+  /* ---------- Layout ---------- */
+  main {
+    max-width: 1040px; margin: 0 auto;
+    padding: 36px 24px 96px;
+    min-height: 70vh;
+    animation: fade .32s ease;
+  }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  /* ---------- Home ---------- */
+  .hero { padding: 30px 0 44px; }
+  .hero h1 {
+    font-size: 30px; margin: 0 0 10px;
+    letter-spacing: -.015em; font-weight: 700;
+  }
+  .hero p { margin: 0; color: var(--muted); font-size: 15px; }
+
+  .space-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 18px; margin-bottom: 52px;
+  }
+  .space-card {
+    display: block; background: var(--card);
+    border: 1px solid var(--line); border-radius: 18px;
+    padding: 26px; cursor: pointer;
+    transition: transform .22s, box-shadow .22s, border-color .22s;
+  }
+  .space-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 34px rgba(60,40,20,.07);
+    border-color: transparent;
+  }
+  .space-avatar {
+    width: 46px; height: 46px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; margin-bottom: 16px;
+  }
+  .space-card h2 { margin: 0 0 6px; font-size: 18px; font-weight: 650; }
+  .space-card p { margin: 0 0 14px; color: var(--muted); font-size: 13.5px; }
+  .space-count {
+    font-size: 12.5px; color: var(--muted);
+    padding-top: 12px; border-top: 1px solid var(--line);
+  }
+  .space-count b { color: var(--accent); font-weight: 650; }
+
+  .section-title {
+    font-size: 15px; font-weight: 650; margin: 0 0 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-title::after {
+    content: ''; flex: 1; height: 1px; background: var(--line);
+  }
+
+  /* ---------- Record card ---------- */
+  .record-list { display: flex; flex-direction: column; gap: 12px; }
+  .record-card {
+    display: flex; gap: 18px; align-items: stretch;
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 16px; padding: 14px;
+    cursor: pointer;
+    transition: border-color .2s, box-shadow .2s, transform .2s;
+  }
+  .record-card:hover {
+    border-color: #ddcfc2;
+    box-shadow: 0 8px 24px rgba(60,40,20,.055);
+    transform: translateY(-1px);
+  }
+  .record-thumb {
+    width: 104px; height: 104px; flex-shrink: 0;
+    border-radius: 11px; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; color: rgba(0,0,0,.24);
+  }
+  .record-thumb img, .record-thumb video {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+  .record-body { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; }
+  .record-badges { display: flex; gap: 6px; margin-bottom: 7px; flex-wrap: wrap; }
+  .badge {
+    font-size: 11.5px; padding: 2px 9px; border-radius: 20px;
+    background: #f2ede6; color: var(--muted); white-space: nowrap;
+  }
+  .badge.brother { background: rgba(107,142,127,.13); color: #4d6d60; }
+  .badge.nephew { background: rgba(196,138,90,.15); color: #a06b3c; }
+  .record-body h4 {
+    margin: 0 0 5px; font-size: 15.5px; font-weight: 650;
+    letter-spacing: -.005em;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .record-excerpt {
+    margin: 0 0 8px; font-size: 13px; color: var(--muted);
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    overflow: hidden; line-height: 1.6;
+  }
+  .record-meta { font-size: 12px; color: #a89e94; letter-spacing: .01em; }
+
+  /* ---------- Detail ---------- */
+  .back-link {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 13.5px; color: var(--muted); margin-bottom: 26px;
+    transition: color .16s;
+  }
+  .back-link:hover { color: var(--accent); }
+
+  .detail { max-width: 760px; }
+  .detail h1 {
+    font-size: 26px; margin: 0 0 14px;
+    letter-spacing: -.015em; line-height: 1.4; font-weight: 700;
+  }
+  .detail-meta {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+    font-size: 12.5px; color: var(--muted); margin-bottom: 28px;
+  }
+
+  .media-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 10px; margin-bottom: 30px;
+  }
+  .media-item {
+    aspect-ratio: 1 / 1; border-radius: 13px; overflow: hidden;
+    position: relative; background: #f2ede6;
+  }
+  .media-item img, .media-item video {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+  .media-item video { object-fit: contain; background: #000; }
+  .ph-block {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12.5px; color: rgba(0,0,0,.3); letter-spacing: .05em;
+  }
+  .media-caption {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    padding: 18px 12px 9px; font-size: 11.5px; color: #fff;
+    background: linear-gradient(transparent, rgba(0,0,0,.55));
+    pointer-events: none;
+  }
+
+  .detail-content { font-size: 15.5px; line-height: 1.9; color: #38322d; }
+  .detail-content p { margin: 0 0 18px; }
+  .detail-content p:last-child { margin-bottom: 0; }
+
+  .note-block {
+    margin-top: 30px; padding: 18px 20px;
+    background: #fdf9f4; border-left: 3px solid var(--accent);
+    border-radius: 0 12px 12px 0;
+    font-size: 14.5px; color: #5c5248;
+  }
+  .note-label {
+    font-size: 11.5px; font-weight: 650; letter-spacing: .08em;
+    color: var(--accent); margin-bottom: 7px;
+  }
+  .note-block p { margin: 0 0 10px; }
+  .note-block p:last-child { margin: 0; }
+
+  .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 30px; }
+  .tag {
+    font-size: 12.5px; padding: 4px 12px; border-radius: 20px;
+    background: var(--accent-soft); color: var(--accent);
+    transition: background .16s, color .16s;
+  }
+  .tag:hover { background: var(--accent); color: #fff; }
+
+  /* ---------- Tags page ---------- */
+  .tag-cloud { display: flex; flex-wrap: wrap; gap: 10px; }
+  .tag-cloud .tag { font-size: 13.5px; padding: 7px 16px; }
+  .tag-cloud .tag span { opacity: .55; margin-left: 4px; font-size: 11.5px; }
+
+  /* ---------- Archive ---------- */
+  .year-block { margin-bottom: 40px; }
+  .year-head {
+    font-size: 22px; font-weight: 700; letter-spacing: -.01em;
+    margin-bottom: 16px; display: flex; align-items: baseline; gap: 10px;
+  }
+  .year-head small { font-size: 12.5px; color: var(--muted); font-weight: 400; }
+  .year-list { display: flex; flex-direction: column; gap: 2px; }
+  .year-item {
+    display: flex; align-items: center; gap: 14px;
+    padding: 11px 12px; border-radius: 10px;
+    transition: background .16s;
+    font-size: 14px;
+  }
+  .year-item:hover { background: #f2ede6; }
+  .year-item .d {
+    font-size: 12px; color: var(--muted);
+    font-variant-numeric: tabular-nums; flex-shrink: 0; width: 46px;
+  }
+  .year-item .t {
+    flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .year-item .p { font-size: 12px; color: var(--muted); flex-shrink: 0; }
+
+  /* ---------- Search ---------- */
+  .search-head { margin-bottom: 26px; }
+  .search-head h1 { font-size: 22px; margin: 0 0 6px; font-weight: 700; }
+  .search-head p { margin: 0; color: var(--muted); font-size: 13.5px; }
+  .empty {
+    padding: 60px 0; text-align: center; color: var(--muted); font-size: 14px;
+  }
+
+  /* ---------- Footer ---------- */
+  footer {
+    border-top: 1px solid var(--line);
+    padding: 30px 24px;
+    text-align: center;
+    font-size: 12.5px; color: #b0a69c;
+  }
+
+  @media (max-width: 720px) {
+    .header-inner { padding: 11px 16px; gap: 10px; flex-wrap: wrap; }
+    nav { order: 3; width: 100%; overflow-x: auto; }
+    nav a { padding: 5px 9px; font-size: 13px; }
+    .search-box { margin-left: auto; }
+    .search-box input { width: 120px; }
+    .search-box input:focus { width: 150px; }
+    main { padding: 24px 16px 70px; }
+    .space-grid { grid-template-columns: 1fr; gap: 12px; margin-bottom: 40px; }
+    .hero { padding: 16px 0 30px; }
+    .hero h1 { font-size: 24px; }
+    .record-thumb { width: 82px; height: 82px; }
+    .record-body h4 { font-size: 14.5px; }
+    .detail h1 { font-size: 21px; }
+    .media-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo" onclick="location.hash='#/'">
+      <span class="logo-dot"></span>成长档案馆
+    </div>
+    <nav id="nav">
+      <a href="#/" data-nav="/">首页</a>
+      <a href="#/brother" data-nav="/brother">弟弟</a>
+      <a href="#/nephew" data-nav="/nephew">侄子</a>
+      <a href="#/tags" data-nav="/tags">标签</a>
+      <a href="#/archive" data-nav="/archive">归档</a>
+    </nav>
+    <div class="search-box">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+        <circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path>
+      </svg>
+      <input id="searchInput" type="search" placeholder="搜索记录…" autocomplete="off">
+    </div>
+  </div>
+</header>
+
+<main id="app"></main>
+
+<footer>成长档案馆 · 仅供记录与回望</footer>
+
+<script>
+/* ============================================================
+   数据区：在这里添加你的记录
+   ------------------------------------------------------------
+   person   : 'brother' 或 'nephew'（必填，决定归入哪个空间）
+   id       : 唯一标识，建议用 空间-日期-序号
+   title    : 标题
+   date     : 日期 YYYY-MM-DD
+   type     : 瞬间 / 日志 / 朋友圈存档 / 里程碑 / 写给未来的信
+   tags     : 标签数组
+   location : 地点，可留空
+   source   : 来源，可留空
+   media    : 媒体数组，{ type:'image'|'video', src:'路径', caption:'说明' }
+              src 留空时会显示占位色块，把图片文件路径填进去即可
+   content  : 正文，支持空行分段和 **加粗**
+   note     : 我的备注，可留空
+   ============================================================ */
+
+const SPACES = {
+  brother: {
+    id: 'brother',
+    name: '弟弟',
+    emoji: '🧑',
+    color: '#6b8e7f',
+    desc: '那些中二的、执拗的、忽然长大的瞬间'
+  },
+  nephew: {
+    id: 'nephew',
+    name: '侄子',
+    emoji: '👦',
+    color: '#c48a5a',
+    desc: '从跌跌撞撞到有模有样'
+  }
+};
+
+const RECORDS = [
+  {
+    id: 'b-2026-09-28',
+    person: 'brother',
+    title: '赛博朋克穿搭日',
+    date: '2026-09-28',
+    type: '瞬间',
+    tags: ['中二', '穿搭', '日常'],
+    location: '郑州',
+    source: '我拍摄',
+    media: [
+      { type: 'image', src: '', caption: '正面' },
+      { type: 'image', src: '', caption: '背影' },
+      { type: 'image', src: '', caption: '鞋子特写' }
+    ],
+    content: '今天弟弟坚持说他的穿搭是赛博朋克。\n\n黑色卫衣配了条银链子，裤脚卷到小腿，说这是"废土感"。我问他废土是什么，他说你不懂。\n\n然后他照了二十分钟镜子。',
+    note: '他后来自己看照片看笑了，说那时候好蠢。我说不蠢，很好看。'
+  },
+  {
+    id: 'b-2026-08-15',
+    person: 'brother',
+    title: '第一次自己坐高铁',
+    date: '2026-08-15',
+    type: '里程碑',
+    tags: ['成长', '第一次'],
+    location: '郑州东站',
+    source: '我拍摄',
+    media: [
+      { type: 'image', src: '', caption: '进站前' },
+      { type: 'video', src: '', caption: '检票口回头' }
+    ],
+    content: '他要自己去外地参加一个夏令营，第一次单独坐高铁。\n\n我在检票口外面站着，他走进去大概十米，回头看了我一眼，又转过去了。没有挥手，也没有说话。\n\n那一刻我觉得他好像突然长高了一点。',
+    note: '全程我盯着手机看定位，一直到他那趟车到站。没告诉他。'
+  },
+  {
+    id: 'b-2026-05-02',
+    person: 'brother',
+    title: '朋友圈存档：关于一场没考好的试',
+    date: '2026-05-02',
+    type: '朋友圈存档',
+    tags: ['朋友圈', '心情'],
+    location: '',
+    source: '朋友圈截图',
+    media: [
+      { type: 'image', src: '', caption: '朋友圈截图' }
+    ],
+    content: '原文：\n\n"有些事努力了也没用，但还是要努力，因为不努力会更没用。"\n\n配图是一张空白的卷子。',
+    note: '那天他什么都没跟我说，但发了这条。我没评论，只是给他煮了碗面。'
+  },
+  {
+    id: 'n-2026-09-20',
+    person: 'nephew',
+    title: '第一次叫清楚"叔叔"',
+    date: '2026-09-20',
+    type: '瞬间',
+    tags: ['第一次', '说话'],
+    location: '家里',
+    source: '我拍摄',
+    media: [
+      { type: 'video', src: '', caption: '全程 12 秒' }
+    ],
+    content: '之前他一直叫成"嘟嘟"，今天突然叫清楚了。\n\n叫完自己愣了一下，然后特别得意地又重复了三遍。',
+    note: '录到了，反复看了好几遍。'
+  },
+  {
+    id: 'n-2026-07-06',
+    person: 'nephew',
+    title: '把西瓜籽种进花盆',
+    date: '2026-07-06',
+    type: '日志',
+    tags: ['日常', '认真'],
+    location: '阳台',
+    source: '我拍摄',
+    media: [
+      { type: 'image', src: '', caption: '埋种子' },
+      { type: 'image', src: '', caption: '浇水' }
+    ],
+    content: '他吃西瓜的时候把籽一颗颗挑出来，说要种。\n\n我给了他一个空花盆。他很认真地挖坑、放籽、盖土、浇水，每个动作都慢得不行。\n\n弄完他蹲在那里看了很久，问什么时候能长出来。我说要等。他说那我就每天来看。',
+    note: '花盆到现在还空着。他每天还是会去看一眼。'
+  },
+  {
+    id: 'n-2026-04-11',
+    person: 'nephew',
+    title: '朋友圈存档：画了一张全家福',
+    date: '2026-04-11',
+    type: '朋友圈存档',
+    tags: ['朋友圈', '画'],
+    location: '',
+    source: '朋友圈截图',
+    media: [
+      { type: 'image', src: '', caption: '截图' }
+    ],
+    content: '他妈妈发的：\n\n"今天画的全家福，每个人都画得特别高，只有他自己画得很小。问他为什么，他说因为我是小孩呀。"',
+    note: '把这张图存下来了。'
+  }
+];
+
+/* ============================================================
+   工具函数
+   ============================================================ */
+
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function renderText(text) {
+  if (!text) return '';
+  return escapeHtml(text)
+    .split(/\n{2,}/)
+    .map(p => '<p>' + p.replace(/\n/g, '<br>').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>') + '</p>')
+    .join('');
+}
+
+function formatDate(d) {
+  if (!d) return '';
+  const parts = d.split('-');
+  if (parts.length < 3) return d;
+  return parts[0] + '年' + (+parts[1]) + '月' + (+parts[2]) + '日';
+}
+
+function hashString(s) {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) {
+    h = ((h << 5) - h + s.charCodeAt(i)) | 0;
+  }
+  return Math.abs(h);
+}
+
+function placeholderStyle(seed) {
+  const hue = hashString(seed) % 360;
+  return 'background: linear-gradient(135deg, hsl(' + hue + ',26%,93%), hsl(' + ((hue + 42) % 360) + ',28%,86%));';
+}
+
+function getPersonRecords(person) {
+  return RECORDS.filter(r => r.person === person).sort((a, b) => b.date.localeCompare(a.date));
+}
+
+function parseHash() {
+  const raw = location.hash.slice(1) || '/';
+  const qIndex = raw.indexOf('?');
+  const path = qIndex >= 0 ? raw.slice(0, qIndex) : raw;
+  const queryStr = qIndex >= 0 ? raw.slice(qIndex + 1) : '';
+  const params = {};
+  if (queryStr) {
+    queryStr.split('&').forEach(kv => {
+      const i = kv.indexOf('=');
+      if (i > 0) {
+        params[decodeURIComponent(kv.slice(0, i))] = decodeURIComponent(kv.slice(i + 1));
+      }
+    });
+  }
+  return { parts: path.split('/').filter(Boolean), params };
+}
+
+/* ============================================================
+   渲染片段
+   ============================================================ */
+
+function renderThumb(record) {
+  const media = record.media && record.media[0];
+  if (media && media.src) {
+    if (media.type === 'video') {
+      return '<video src="' + escapeHtml(media.src) + '" muted preload="metadata"></video>';
+    }
+    return '<img src="' + escapeHtml(media.src) + '" alt="" loading="lazy">';
+  }
+  const symbol = media && media.type === 'video' ? '▶' : '◆';
+  return '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:20px;color:rgba(0,0,0,.22);' + placeholderStyle(record.id) + '">' + symbol + '</div>';
+}
+
+function renderRecordCard(r) {
+  const space = SPACES[r.person];
+  const excerpt = (r.content || '').replace(/\n+/g, ' ').trim();
+  return '' +
+    '<a class="record-card" href="#/record/' + encodeURIComponent(r.id) + '">' +
+      '<div class="record-thumb">' + renderThumb(r) + '</div>' +
+      '<div class="record-body">' +
+        '<div class="record-badges">' +
+          '<span class="badge ' + r.person + '">' + space.name + '</span>' +
+          '<span class="badge">' + escapeHtml(r.type || '记录') + '</span>' +
+        '</div>' +
+        '<h4>' + escapeHtml(r.title) + '</h4>' +
+        (excerpt ? '<p class="record-excerpt">' + escapeHtml(excerpt) + '</p>' : '') +
+        '<div class="record-meta">' + formatDate(r.date) +
+          (r.location ? ' · ' + escapeHtml(r.location) : '') +
+        '</div>' +
+      '</div>' +
+    '</a>';
+}
+
+function renderMediaItem(m, seed) {
+  let inner;
+  if (m.src) {
+    if (m.type === 'video') {
+      inner = '<video src="' + escapeHtml(m.src) + '" controls preload="metadata"></video>';
+    } else {
+      inner = '<img src="' + escapeHtml(m.src) + '" alt="' + escapeHtml(m.caption || '') + '" loading="lazy">';
+    }
+  } else {
+    inner = '<div class="ph-block" style="' + placeholderStyle(seed) + '">' +
+      (m.type === 'video' ? '视频' : '图片') + '</div>';
+  }
+  const caption = m.caption
+    ? '<div class="media-caption">' + escapeHtml(m.caption) + '</div>'
+    : '';
+  return '<div class="media-item">' + inner + caption + '</div>';
+}
+
+/* ============================================================
+   页面
+   ============================================================ */
+
+const app = document.getElementById('app');
+
+function renderHome() {
+  const total = RECORDS.length;
+  const recent = RECORDS.slice().sort((a, b) => b.date.localeCompare(a.date)).slice(0, 6);
+
+  const spaceCards = Object.values(SPACES).map(s => {
+    const count = getPersonRecords(s.id).length;
+    return '' +
+      '<a class="space-card" href="#/' + s.id + '">' +
+        '<div class="space-avatar" style="background:' + s.color + '22;color:' + s.color + '">' + s.emoji + '</div>' +
+        '<h2>' + s.name + '的空间</h2>' +
+        '<p>' + escapeHtml(s.desc) + '</p>' +
+        '<div class="space-count"><b>' + count + '</b> 条记录</div>' +
+      '</a>';
+  }).join('');
+
+  app.innerHTML = '' +
+    '<section class="hero">' +
+      '<h1>成长档案馆</h1>' +
+      '<p>把那些非主流的瞬间，一一收好。共 ' + total + ' 条记录。</p>' +
+    '</section>' +
+    '<div class="space-grid">' + spaceCards + '</div>' +
+    '<h3 class="section-title">最近记录</h3>' +
+    '<div class="record-list">' + recent.map(renderRecordCard).join('') + '</div>';
+}
+
+function renderSpace(personId) {
+  const space = SPACES[personId];
+  if (!space) { renderNotFound(); return; }
+  const records = getPersonRecords(personId);
+
+  app.innerHTML = '' +
+    '<section class="hero" style="padding-top:12px">' +
+      '<h1>' + space.name + '的空间</h1>' +
+      '<p>' + escapeHtml(space.desc) + ' · 共 ' + records.length + ' 条记录</p>' +
+    '</section>' +
+    (records.length
+      ? '<div class="record-list">' + records.map(renderRecordCard).join('') + '</div>'
+      : '<div class="empty">还没有记录</div>');
+}
+
+function renderRecord(id) {
+  const r = RECORDS.find(x => x.id === id);
+  if (!r) { renderNotFound(); return; }
+  const space = SPACES[r.person];
+
+  const mediaHtml = (r.media && r.media.length)
+    ? '<div class="media-grid">' + r.media.map((m, i) => renderMediaItem(m, r.id + '-' + i)).join('') + '</div>'
+    : '';
+
+  const noteHtml = r.note
+    ? '<div class="note-block"><div class="note-label">我的备注</div>' + renderText(r.note) + '</div>'
+    : '';
+
+  const tagsHtml = (r.tags && r.tags.length)
+    ? '<div class="tag-row">' + r.tags.map(t =>
+        '<a class="tag" href="#/tag/' + encodeURIComponent(t) + '">#' + escapeHtml(t) + '</a>'
+      ).join('') + '</div>'
+    : '';
+
+  const metaParts = [];
+  metaParts.push('<span class="badge ' + r.person + '">' + space.name + '</span>');
+  if (r.type) metaParts.push('<span class="badge">' + escapeHtml(r.type) + '</span>');
+  metaParts.push('<span>' + formatDate(r.date) + '</span>');
+  if (r.location) metaParts.push('<span>· ' + escapeHtml(r.location) + '</span>');
+  if (r.source) metaParts.push('<span>· ' + escapeHtml(r.source) + '</span>');
+
+  app.innerHTML = '' +
+    '<a class="back-link" href="#/' + r.person + '">← 返回' + space.name + '的空间</a>' +
+    '<article class="detail">' +
+      '<h1>' + escapeHtml(r.title) + '</h1>' +
+      '<div class="detail-meta">' + metaParts.join('') + '</div>' +
+      mediaHtml +
+      '<div class="detail-content">' + renderText(r.content) + '</div>' +
+      noteHtml +
+      tagsHtml +
+    '</article>';
+}
+
+function renderTags() {
+  const map = {};
+  RECORDS.forEach(r => {
+    (r.tags || []).forEach(t => { map[t] = (map[t] || 0) + 1; });
+  });
+  const list = Object.keys(map).sort((a, b) => map[b] - map[a] || a.localeCompare(b, 'zh'));
+
+  app.innerHTML = '' +
+    '<section class="hero" style="padding-top:12px">' +
+      '<h1>标签</h1>' +
+      '<p>共 ' + list.length + ' 个标签</p>' +
+    '</section>' +
+    (list.length
+      ? '<div class="tag-cloud">' + list.map(t =>
+          '<a class="tag" href="#/tag/' + encodeURIComponent(t) + '">#' + escapeHtml(t) + '<span>' + map[t] + '</span></a>'
+        ).join('') + '</div>'
+      : '<div class="empty">还没有标签</div>');
+}
+
+function renderTag(tag) {
+  const list = RECORDS.filter(r => (r.tags || []).indexOf(tag) >= 0)
+    .sort((a, b) => b.date.localeCompare(a.date));
+
+  app.innerHTML = '' +
+    '<section class="hero" style="padding-top:12px">' +
+      '<h1>#' + escapeHtml(tag) + '</h1>' +
+      '<p>共 ' + list.length + ' 条记录</p>' +
+    '</section>' +
+    (list.length
+      ? '<div class="record-list">' + list.map(renderRecordCard).join('') + '</div>'
+      : '<div class="empty">没有相关记录</div>');
+}
+
+function renderArchive() {
+  const sorted = RECORDS.slice().sort((a, b) => b.date.localeCompare(a.date));
+  const years = {};
+  sorted.forEach(r => {
+    const y = (r.date || '').slice(0, 4) || '未知';
+    (years[y] = years[y] || []).push(r);
+  });
+  const keys = Object.keys(years).sort((a, b) => b.localeCompare(a));
+
+  const blocks = keys.map(y => {
+    const items = years[y].map(r => {
+      const space = SPACES[r.person];
+      return '' +
+        '<a class="year-item" href="#/record/' + encodeURIComponent(r.id) + '">' +
+          '<span class="d">' + escapeHtml((r.date || '').slice(5)) + '</span>' +
+          '<span class="t">' + escapeHtml(r.title) + '</span>' +
+          '<span class="p">' + space.name + '</span>' +
+        '</a>';
+    }).join('');
+    return '' +
+      '<div class="year-block">' +
+        '<div class="year-head">' + y + ' <small>' + years[y].length + ' 条</small></div>' +
+        '<div class="year-list">' + items + '</div>' +
+      '</div>';
+  }).join('');
+
+  app.innerHTML = '' +
+    '<section class="hero" style="padding-top:12px">' +
+      '<h1>归档</h1>' +
+      '<p>按年份排列的全部记录</p>' +
+    '</section>' +
+    (blocks || '<div class="empty">还没有记录</div>');
+}
+
+function renderSearch(q) {
+  const query = (q || '').trim().toLowerCase();
+  let results = [];
+  if (query) {
+    results = RECORDS.filter(r => {
+      const hay = [
+        r.title || '',
+        r.content || '',
+        r.note || '',
+        r.location || '',
+        r.type || '',
+        (r.tags || []).join(' ')
+      ].join(' ').toLowerCase();
+      return hay.indexOf(query) >= 0;
+    }).sort((a, b) => b.date.localeCompare(a.date));
+  }
+
+  app.innerHTML = '' +
+    '<section class="search-head">' +
+      '<h1>搜索</h1>' +
+      '<p>' + (query ? '关键词「' + escapeHtml(q) + '」，找到 ' + results.length + ' 条记录' : '在右上角输入关键词开始搜索') + '</p>' +
+    '</section>' +
+    (query
+      ? (results.length
+          ? '<div class="record-list">' + results.map(renderRecordCard).join('') + '</div>'
+          : '<div class="empty">没有找到相关记录</div>')
+      : '');
+}
+
+function renderNotFound() {
+  app.innerHTML = '<div class="empty">页面不存在</div>';
+}
+
+/* ============================================================
+   路由
+   ============================================================ */
+
+function updateNav(parts) {
+  const path = '/' + (parts[0] || '');
+  document.querySelectorAll('#nav a').forEach(a => {
+    a.classList.toggle('active', a.getAttribute('data-nav') === path);
+  });
+}
+
+function route() {
+  const { parts, params } = parseHash();
+  window.scrollTo(0, 0);
+  updateNav(parts);
+
+  const searchInput = document.getElementById('searchInput');
+
+  if (parts.length === 0) {
+    renderHome();
+    searchInput.value = '';
+  } else if (parts[0] === 'brother' || parts[0] === 'nephew') {
+    renderSpace(parts[0]);
+    searchInput.value = '';
+  } else if (parts[0] === 'record') {
+    renderRecord(decodeURIComponent(parts[1] || ''));
+    searchInput.value = '';
+  } else if (parts[0] === 'tags') {
+    renderTags();
+    searchInput.value = '';
+  } else if (parts[0] === 'tag') {
+    renderTag(decodeURIComponent(parts[1] || ''));
+    searchInput.value = '';
+  } else if (parts[0] === 'archive') {
+    renderArchive();
+    searchInput.value = '';
+  } else if (parts[0] === 'search') {
+    const q = params.q || '';
+    searchInput.value = q;
+    renderSearch(q);
+  } else {
+    renderNotFound();
+    searchInput.value = '';
+  }
+}
+
+/* 搜索框：回车跳转 */
+document.getElementById('searchInput').addEventListener('keydown', function (e) {
+  if (e.key === 'Enter') {
+    const q = this.value.trim();
+    if (q) {
+      location.hash = '#/search?q=' + encodeURIComponent(q);
+    } else {
+      location.hash = '#/';
+    }
+    this.blur();
+  }
+});
+
+window.addEventListener('hashchange', route);
+window.addEventListener('DOMContentLoaded', route);
+if (document.readyState !== 'loading') route();
+</script>
+</body>
+</html>
